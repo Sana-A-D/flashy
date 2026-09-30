@@ -14,16 +14,22 @@ function resolveApiUrl(): string {
   const isWebLan = /^192\.168\.|^10\.|^172\.(1[6-9]|2\d|3[01])\./.test(webHost);
   const isWebPublic = hasWindow && !isWebLocalhost && !isWebLan;
 
+  const rawUrl = (envApiUrl || '').trim().replace(/\/+$/, '');
   const isEnvLocalOrLan =
-    !envApiUrl ||
-    /localhost|127\.0\.0\.1|^https?:\/\/(192\.168\.|10\.|172\.(1[6-9]|2\d|3[01])\.)/.test(envApiUrl);
+    !rawUrl ||
+    /localhost|127\.0\.0\.1|^https?:\/\/(192\.168\.|10\.|172\.(1[6-9]|2\d|3[01])\.)/.test(rawUrl);
+
+  const normalizeUrl = (url: string) => {
+    const clean = url.replace(/\/+$/, '');
+    return clean.endsWith('/api/v1') ? clean : `${clean}/api/v1`;
+  };
 
   // 1. Web on Public Domain (e.g. Vercel deployment)
   if (isWeb && isWebPublic) {
-    if (envApiUrl && !isEnvLocalOrLan) {
-      return envApiUrl.endsWith('/api/v1') ? envApiUrl : `${envApiUrl}/api/v1`;
+    if (rawUrl && !isEnvLocalOrLan) {
+      return normalizeUrl(rawUrl);
     }
-    return '/api/v1';
+    return normalizeUrl(window.location.origin);
   }
 
   // 2. Web on Localhost (Browser dev on the same machine)
@@ -38,8 +44,8 @@ function resolveApiUrl(): string {
 
   // 4. Native (Expo Go / Android / iOS)
   // Production / standalone app with public backend
-  if (envApiUrl && !isEnvLocalOrLan) {
-    return envApiUrl.endsWith('/api/v1') ? envApiUrl : `${envApiUrl}/api/v1`;
+  if (rawUrl && !isEnvLocalOrLan) {
+    return normalizeUrl(rawUrl);
   }
 
   // Expo Go development: automatically uses the Metro server's actual LAN IP
@@ -49,8 +55,8 @@ function resolveApiUrl(): string {
   }
 
   // Explicit local development environment variable
-  if (envApiUrl) {
-    return envApiUrl.endsWith('/api/v1') ? envApiUrl : `${envApiUrl}/api/v1`;
+  if (rawUrl) {
+    return normalizeUrl(rawUrl);
   }
 
   // Android emulator default gateway
@@ -62,9 +68,6 @@ function resolveApiUrl(): string {
 }
 
 export const ACTUAL_API_URL = resolveApiUrl();
-
-
-
 
 export const apiClient = {
   async fetch(endpoint: string, options: RequestInit = {}) {
@@ -83,9 +86,13 @@ export const apiClient = {
       headers.Authorization = `Bearer ${accessToken}`;
     }
 
+    const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+    const cleanBase = ACTUAL_API_URL.replace(/\/+$/, '');
+    const requestUrl = `${cleanBase}${cleanEndpoint}`;
+
     let response: Response;
     try {
-      response = await fetch(`${ACTUAL_API_URL}${endpoint}`, {
+      response = await fetch(requestUrl, {
         ...options,
         headers,
       });
