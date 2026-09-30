@@ -97,7 +97,7 @@ export const apiClient = {
         headers,
       });
     } catch (netErr: any) {
-      console.error(`[API Network Error] ${options.method || 'GET'} ${ACTUAL_API_URL}${endpoint}:`, netErr);
+      console.error(`[API Network Error] ${options.method || 'GET'} ${requestUrl}:`, netErr);
       const hostMsg = ACTUAL_API_URL.includes('localhost')
         ? 'Cannot reach localhost from mobile/browser. Make sure the backend server is running and accessible.'
         : `Cannot connect to server at ${ACTUAL_API_URL}. Check your network connection.`;
@@ -110,7 +110,7 @@ export const apiClient = {
       // Try to refresh token
       const refreshToken = await Storage.getItemAsync('refreshToken');
       if (refreshToken) {
-        const refreshResponse = await fetch(`${ACTUAL_API_URL}/auth/refresh`, {
+        const refreshResponse = await fetch(`${cleanBase}/auth/refresh`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ refreshToken }),
@@ -123,7 +123,7 @@ export const apiClient = {
           
           // Retry original request
           headers.Authorization = `Bearer ${data.accessToken}`;
-          response = await fetch(`${ACTUAL_API_URL}${endpoint}`, {
+          response = await fetch(requestUrl, {
             ...options,
             headers,
           });
