@@ -72,8 +72,13 @@ export const buildServer = (httpsOptions?: any) => {
     });
   });
 
-  server.get('/health', async (request, reply) => {
-    return reply.status(200).send('ok');
+  // Health check and root ping routes
+  server.get('/health', async () => {
+    return { status: 'ok' };
+  });
+
+  server.get('/', async () => {
+    return { status: 'ok' };
   });
 
   // Register routes
@@ -94,9 +99,19 @@ export const buildServer = (httpsOptions?: any) => {
 
 const start = async () => {
   try {
+    const isProduction = process.env.NODE_ENV === 'production' || !!process.env.PORT;
+    const port = Number(process.env.PORT) || 3001;
+
+    // In production or on hosted platforms (Render/Railway), run ONLY a single plain HTTP server on 0.0.0.0
+    if (isProduction) {
+      const server = buildServer();
+      await server.listen({ port, host: '0.0.0.0' });
+      console.log(`[Production] HTTP Server listening on port ${port} on 0.0.0.0`);
+      return;
+    }
+
+    // Local development HTTPS + HTTP setup (if HTTPS_ENABLED=true)
     const httpsEnabled = process.env.HTTPS_ENABLED === 'true';
-    const port = process.env.PORT ? parseInt(process.env.PORT) : 3000;
-    
     if (httpsEnabled) {
       const keyPath = process.env.HTTPS_KEY_PATH ? path.resolve(__dirname, '../../', process.env.HTTPS_KEY_PATH) : '';
       const certPath = process.env.HTTPS_CERT_PATH ? path.resolve(__dirname, '../../', process.env.HTTPS_CERT_PATH) : '';
@@ -106,20 +121,19 @@ const start = async () => {
         cert: fs.readFileSync(certPath)
       };
       
-      // Start HTTPS on the primary port
+      const localHttpsPort = 3000;
       const secureServer = buildServer(httpsOptions);
-      await secureServer.listen({ port, host: '0.0.0.0' });
-      console.log(`HTTPS Server listening at https://localhost:${port}`);
+      await secureServer.listen({ port: localHttpsPort, host: '0.0.0.0' });
+      console.log(`[Dev] HTTPS Server listening at https://localhost:${localHttpsPort}`);
 
-      // Start HTTP on primary port + 1 for mobile app
       const insecureServer = buildServer();
-      const httpPort = port + 1;
-      await insecureServer.listen({ port: httpPort, host: '0.0.0.0' });
-      console.log(`HTTP Server listening at http://localhost:${httpPort}`);
+      const localHttpPort = 3001;
+      await insecureServer.listen({ port: localHttpPort, host: '0.0.0.0' });
+      console.log(`[Dev] HTTP Server listening at http://localhost:${localHttpPort}`);
     } else {
       const server = buildServer();
       await server.listen({ port, host: '0.0.0.0' });
-      console.log(`HTTP Server listening at http://localhost:${port}`);
+      console.log(`[Dev] HTTP Server listening at http://localhost:${port}`);
     }
   } catch (err: any) {
     console.error('Error starting server:', err);
