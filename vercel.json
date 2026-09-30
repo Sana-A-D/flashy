@@ -1,6 +1,6 @@
 {
-  "buildCommand": "npx expo export -p web",
-  "outputDirectory": "dist",
+  "buildCommand": "cd mobile && npm install && npx expo export -p web",
+  "outputDirectory": "mobile/dist",
   "cleanUrls": true,
   "headers": [
     {
