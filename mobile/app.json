@@ -1,0 +1,46 @@
+{
+  "expo": {
+    "name": "Flashy",
+    "slug": "flashy",
+    "scheme": "flashy",
+    "version": "1.0.0",
+    "sdkVersion": "54.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#F9F8F6",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ],
+      "package": "com.anonymous.flashy"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Flashy accesses your photos to identify garments and discover fashion intelligence.",
+          "cameraPermission": "Flashy accesses your camera to scan clothing and accessories."
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "2e515307-9bdc-4230-b576-75e739112305"
+      }
+    },
+    "owner": "sana-a-d"
+  }
+}
