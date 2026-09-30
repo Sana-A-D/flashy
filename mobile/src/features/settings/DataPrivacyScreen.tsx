@@ -6,6 +6,7 @@ import {
   SafeAreaView,
   ScrollView,
   Alert,
+  Platform,
 } from 'react-native';
 import { useAuthStore } from '../auth/store/useAuthStore';
 import { useDataPrivacy } from '../../hooks/useDataPrivacy';
@@ -27,47 +28,64 @@ export const DataPrivacyScreen = ({ navigation }: any) => {
   const handleExportData = async () => {
     try {
       const data = await exportData();
-      Alert.alert(
-        'Export Generated',
-        `Your inventory data has been packaged successfully.\n\nTotal Items: ${data?.items?.length || 0}\nTotal Sales: ${data?.summary?.totalSales || 0}`,
-        [{ text: 'OK' }]
-      );
+      const msg = `Your inventory data has been packaged successfully.\n\nTotal Items: ${data?.items?.length || 0}\nTotal Sales: ${data?.summary?.totalSales || 0}`;
+      if (Platform.OS === 'web') {
+        window.alert(`Export Generated\n\n${msg}`);
+      } else {
+        Alert.alert('Export Generated', msg, [{ text: 'OK' }]);
+      }
     } catch (err: any) {
-      Alert.alert(
-        'Export Failed',
-        err.response?.data?.error?.message || err.message || 'Could not export data.'
-      );
+      const msg = err.response?.data?.error?.message || err.message || 'Could not export data.';
+      if (Platform.OS === 'web') {
+        window.alert(`Export Failed: ${msg}`);
+      } else {
+        Alert.alert('Export Failed', msg);
+      }
     }
   };
 
-  const handleDeleteAccount = () => {
+  const handleDeleteAccount = async () => {
     if (deleteConfirmation.trim().toUpperCase() !== 'DELETE') {
-      Alert.alert('Confirmation Required', 'Please type DELETE in the confirmation box below to confirm account deletion.');
+      if (Platform.OS === 'web') {
+        window.alert('Please type DELETE in the confirmation box below to confirm account deletion.');
+      } else {
+        Alert.alert('Confirmation Required', 'Please type DELETE in the confirmation box below to confirm account deletion.');
+      }
       return;
     }
 
-    Alert.alert(
-      'Permanent Deletion',
-      'This will permanently delete your account, inventory records, and sales history. This action cannot be undone.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Confirm & Delete',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await deleteAccount(deleteConfirmation.trim());
-              await logout();
-            } catch (err: any) {
-              Alert.alert(
-                'Delete Failed',
-                err.response?.data?.error?.message || err.message || 'Could not delete account.'
-              );
-            }
+    const performDelete = async () => {
+      try {
+        await deleteAccount(deleteConfirmation.trim());
+        await logout();
+      } catch (err: any) {
+        const msg = err.response?.data?.error?.message || err.message || 'Could not delete account.';
+        if (Platform.OS === 'web') {
+          window.alert(`Delete Failed: ${msg}`);
+        } else {
+          Alert.alert('Delete Failed', msg);
+        }
+      }
+    };
+
+    if (Platform.OS === 'web') {
+      if (typeof window !== 'undefined' && window.confirm('This will permanently delete your account, inventory records, and sales history. This action cannot be undone. Are you sure?')) {
+        await performDelete();
+      }
+    } else {
+      Alert.alert(
+        'Permanent Deletion',
+        'This will permanently delete your account, inventory records, and sales history. This action cannot be undone.',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Confirm & Delete',
+            style: 'destructive',
+            onPress: performDelete,
           },
-        },
-      ]
-    );
+        ]
+      );
+    }
   };
 
   return (

@@ -54,6 +54,8 @@ export function ItemPhotoSection({ photos, onChange }: ItemPhotoSectionProps) {
     try {
       const result = await ImagePicker.launchCameraAsync({
         mediaTypes: ['images'],
+        cameraType: ImagePicker.CameraType?.back || 'back',
+        allowsEditing: false,
         quality: 0.8,
       });
 
@@ -110,11 +112,7 @@ export function ItemPhotoSection({ photos, onChange }: ItemPhotoSectionProps) {
   };
 
   const handleAddPress = () => {
-    Alert.alert('Add Photo', 'Choose photo source', [
-      { text: 'Take Photo', onPress: handleTakePhoto },
-      { text: 'Choose from Gallery', onPress: handleChooseGallery },
-      { text: 'Cancel', style: 'cancel' },
-    ]);
+    handleChooseGallery();
   };
 
   const removePhoto = (index: number) => {

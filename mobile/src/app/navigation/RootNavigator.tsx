@@ -34,13 +34,8 @@ export function RootNavigator() {
   const { isAuthenticated, isHydrating, initialize } = useAuthStore();
 
   useEffect(() => {
-    console.log("RootNavigator mounted, initializing auth state...");
     initialize();
-  }, []);
-
-  useEffect(() => {
-    console.log("Auth state changed - isAuthenticated:", isAuthenticated);
-  }, [isAuthenticated]);
+  }, [initialize]);
 
   if (isHydrating) {
     return (

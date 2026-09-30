@@ -5,6 +5,7 @@ import {
   StyleSheet,
   ScrollView,
   Alert,
+  Platform,
   TouchableOpacity,
 } from 'react-native';
 import { useAuthStore } from '../auth/store/useAuthStore';
@@ -21,15 +22,8 @@ export const SettingsScreen = ({ navigation }: any) => {
   const logout = useAuthStore((state) => state.logout);
   const { colors, isDark, toggleTheme, mode } = useFashionTheme();
 
-  const handleLogout = () => {
-    Alert.alert('Sign Out', 'Are you sure you want to sign out of Flashy?', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Sign Out',
-        style: 'destructive',
-        onPress: () => logout(),
-      },
-    ]);
+  const handleLogout = async () => {
+    await logout();
   };
 
   return (

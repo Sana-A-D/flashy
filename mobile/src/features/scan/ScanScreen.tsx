@@ -46,8 +46,8 @@ export const ScanScreen = ({ navigation }: any) => {
 
       const result = await ImagePicker.launchCameraAsync({
         mediaTypes: ['images'],
-        allowsEditing: true,
-        aspect: [3, 4],
+        cameraType: ImagePicker.CameraType?.back || 'back',
+        allowsEditing: false,
         quality: 0.85,
         base64: true,
       });
@@ -229,7 +229,7 @@ export const ScanScreen = ({ navigation }: any) => {
                     styles.previewActionBtn,
                     { backgroundColor: colors.burgundy },
                   ]}
-                  onPress={() => handleTakePhoto()}
+                  onPress={() => handlePickPhoto()}
                   disabled={isProcessing || photos.length >= 8}
                 >
                   <Text style={styles.previewActionBtnPrimaryText}>
@@ -244,7 +244,7 @@ export const ScanScreen = ({ navigation }: any) => {
                 <PrettyIcon name="camera" size="lg" variant="coral" />
               </View>
               <Text style={[styles.viewfinderTitle, { color: colors.text }]}>
-                Photograph any fashion piece
+                Select any fashion piece
               </Text>
               <Text style={[styles.viewfinderSubtitle, { color: colors.textSecondary }]}>
                 Denim, knitwear, tailoring, chore jackets, or accessories. Flashy identifies the silhouette, fabric weave, and resale pricing.
@@ -252,18 +252,11 @@ export const ScanScreen = ({ navigation }: any) => {
 
               <View style={styles.intakeActionsRow}>
                 <AppButton
-                  title="Take Photo"
-                  onPress={() => handleTakePhoto('Front')}
-                  variant="primary"
-                  size="md"
-                  style={styles.intakeActionBtn}
-                />
-                <AppButton
-                  title="Choose from Library"
+                  title="Choose Photo"
                   onPress={handlePickPhoto}
-                  variant="secondary"
-                  size="md"
-                  style={styles.intakeActionBtn}
+                  variant="primary"
+                  size="lg"
+                  style={{ width: '100%' }}
                 />
               </View>
             </View>

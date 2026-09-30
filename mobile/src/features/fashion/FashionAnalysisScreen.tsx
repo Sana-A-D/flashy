@@ -1109,22 +1109,14 @@ export const FashionAnalysisScreen = ({ route, navigation }: any) => {
         <View style={styles.divider} />
 
 
-        {/* Bottom Save & Delete Actions */}
+        {/* Bottom Save Action */}
         <View style={styles.bottomActionSection}>
           <AppButton
             title={item.saved ? 'Saved in your wardrobe ★' : 'Save this look'}
             onPress={handleToggleSave}
             variant={item.saved ? 'secondary' : 'primary'}
             size="lg"
-            style={{ width: '100%', marginBottom: spacing.sm }}
-          />
-          <AppButton
-            title="Delete this scan"
-            onPress={handleDelete}
-            variant="ghost"
-            size="sm"
             style={{ width: '100%' }}
-            textStyle={{ color: colors.textMuted }}
           />
         </View>
       </ScrollView>

@@ -130,8 +130,8 @@ export const AddItemScreen = ({ navigation }: any) => {
 
       const result = await ImagePicker.launchCameraAsync({
         mediaTypes: ['images'],
-        allowsEditing: true,
-        aspect: [4, 3],
+        cameraType: ImagePicker.CameraType?.back || 'back',
+        allowsEditing: false,
         quality: 0.85,
         base64: true,
       });
@@ -197,6 +197,8 @@ export const AddItemScreen = ({ navigation }: any) => {
           if (!perm.granted) return;
           const res = await ImagePicker.launchCameraAsync({
             mediaTypes: ['images'],
+            cameraType: ImagePicker.CameraType?.back || 'back',
+            allowsEditing: false,
             quality: 0.85,
             base64: true,
           });
@@ -684,18 +686,11 @@ export const AddItemScreen = ({ navigation }: any) => {
 
                 <View style={styles.choiceActionRow}>
                   <AppButton
-                    title="Take Photo & Scan"
-                    onPress={handleTakePhoto}
+                    title="Choose Photo & Scan"
+                    onPress={handlePickPhotos}
                     variant="primary"
                     size="md"
                     style={{ flex: 1 }}
-                  />
-                  <AppButton
-                    title="Pick Photos"
-                    onPress={handlePickPhotos}
-                    variant="outline"
-                    size="md"
-                    style={{ marginLeft: spacing.xs }}
                   />
                 </View>
               </AppCard>

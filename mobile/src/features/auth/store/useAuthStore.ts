@@ -83,15 +83,21 @@ export const useAuthStore = create<AuthState>((set) => ({
     try {
       const refreshToken = await Storage.getItemAsync('refreshToken');
       if (refreshToken) {
-        await apiClient.fetch('/auth/logout', {
-          method: 'POST',
-          body: JSON.stringify({ refreshToken }),
-        });
+        try {
+          await apiClient.fetch('/auth/logout', {
+            method: 'POST',
+            body: JSON.stringify({ refreshToken }),
+          });
+        } catch {
+          // Silent catch to ensure local session is always wiped
+        }
       }
+    } catch {
+      // Silent catch
     } finally {
       await Storage.deleteItemAsync('accessToken');
       await Storage.deleteItemAsync('refreshToken');
-      set({ user: null, isAuthenticated: false });
+      set({ user: null, isAuthenticated: false, isLoading: false, isHydrating: false });
     }
   }
 }));
