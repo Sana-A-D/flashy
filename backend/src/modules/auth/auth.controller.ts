@@ -6,7 +6,25 @@ import { z } from 'zod';
 export class AuthController {
   async register(request: FastifyRequest, reply: FastifyReply) {
     try {
-      const data = registerSchema.parse(request.body);
+      console.log('[AUTH-DEBUG] Register request received');
+      console.log('[AUTH-DEBUG] Content-Type header:', request.headers['content-type']);
+      console.log('[AUTH-DEBUG] typeof request.body:', typeof request.body);
+      console.log('[AUTH-DEBUG] request.body raw:', request.body);
+
+      let body: any = request.body;
+      if (typeof body === 'string') {
+        try {
+          body = JSON.parse(body);
+        } catch (e) {
+          console.warn('[AUTH-DEBUG] Failed to JSON.parse string body:', e);
+        }
+      }
+
+      if (body && typeof body.email === 'string') {
+        body.email = body.email.trim().toLowerCase();
+      }
+
+      const data = registerSchema.parse(body);
       const user = await authService.register(data);
       
       const accessToken = await reply.jwtSign({ id: user.id }, { expiresIn: '30m' });
@@ -22,6 +40,7 @@ export class AuthController {
       });
     } catch (error) {
       if (error instanceof z.ZodError) {
+        console.warn('[AUTH-DEBUG] Register validation error:', error.issues || (error as any).errors);
         const message = (error as any).issues?.[0]?.message || (error as any).errors?.[0]?.message || 'Validation failed';
         return reply.code(400).send({ success: false, error: { code: 'VALIDATION_ERROR', message } });
       }
@@ -35,7 +54,25 @@ export class AuthController {
 
   async login(request: FastifyRequest, reply: FastifyReply) {
     try {
-      const data = loginSchema.parse(request.body);
+      console.log('[AUTH-DEBUG] Login request received');
+      console.log('[AUTH-DEBUG] Content-Type header:', request.headers['content-type']);
+      console.log('[AUTH-DEBUG] typeof request.body:', typeof request.body);
+      console.log('[AUTH-DEBUG] request.body raw:', request.body);
+
+      let body: any = request.body;
+      if (typeof body === 'string') {
+        try {
+          body = JSON.parse(body);
+        } catch (e) {
+          console.warn('[AUTH-DEBUG] Failed to JSON.parse string body:', e);
+        }
+      }
+
+      if (body && typeof body.email === 'string') {
+        body.email = body.email.trim().toLowerCase();
+      }
+
+      const data = loginSchema.parse(body);
       const user = await authService.validateUser(data);
 
       if (!user) {
@@ -55,6 +92,7 @@ export class AuthController {
       });
     } catch (error) {
       if (error instanceof z.ZodError) {
+        console.warn('[AUTH-DEBUG] Login validation error:', error.issues || (error as any).errors);
         const message = (error as any).issues?.[0]?.message || (error as any).errors?.[0]?.message || 'Validation failed';
         return reply.code(400).send({ success: false, error: { code: 'VALIDATION_ERROR', message } });
       }
