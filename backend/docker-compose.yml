@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    container_name: listingmate_db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: listingmate
+    ports:
+      - "5432:5432"
+    volumes:
+      - listingmate_db_data:/var/lib/postgresql/data
+
+volumes:
+  listingmate_db_data:
