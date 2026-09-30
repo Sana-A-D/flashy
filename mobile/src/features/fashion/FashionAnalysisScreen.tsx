@@ -1709,7 +1709,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   editorialVisualOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: 'rgba(0, 0, 0, 0.35)',
   },
   editorialBadgeRow: {
@@ -3098,7 +3098,7 @@ const styles = StyleSheet.create({
     letterSpacing: 1.2,
   },
   dealProductScrim: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: 'rgba(0, 0, 0, 0.35)',
   },
   dealTopBadges: {
@@ -3210,7 +3210,7 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   trendEditorialScrim: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: 'rgba(0, 0, 0, 0.55)',
   },
   trendHeroContent: {
@@ -3330,7 +3330,7 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   styleEditorialScrim: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: 'rgba(0, 0, 0, 0.42)',
   },
   styleTopBar: {

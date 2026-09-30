@@ -4,19 +4,17 @@
     "slug": "flashy",
     "scheme": "flashy",
     "version": "1.0.0",
-    "sdkVersion": "54.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#F9F8F6",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
-        "monochromeImage": "./assets/android-icon-monochrome.png"
+        "backgroundColor": "#F9F8F6"
       },
       "predictiveBackGestureEnabled": false,
       "permissions": [
@@ -25,7 +23,9 @@
       "package": "com.anonymous.flashy"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro",
+      "output": "single"
     },
     "plugins": [
       [
@@ -34,7 +34,10 @@
           "photosPermission": "Flashy accesses your photos to identify garments and discover fashion intelligence.",
           "cameraPermission": "Flashy accesses your camera to scan clothing and accessories."
         }
-      ]
+      ],
+      "expo-secure-store",
+      "expo-status-bar",
+      "expo-web-browser"
     ],
     "extra": {
       "eas": {

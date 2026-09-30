@@ -26,9 +26,29 @@ export const buildServer = (httpsOptions?: any) => {
   });
 
   server.register(cors, {
-    origin: '*', // To be configured properly in production
+    origin: (origin, cb) => {
+      // Allow mobile apps, curl, and requests with no origin header
+      if (!origin) return cb(null, true);
+
+      const customOrigins = process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',').map(s => s.trim()) : [];
+      if (customOrigins.includes('*') || customOrigins.includes(origin)) {
+        return cb(null, true);
+      }
+
+      // Allow localhost, LAN IPs, and Vercel deployment domains
+      const isLocalhost = /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
+      const isLan = /^http:\/\/(192\.168\.|10\.|172\.(1[6-9]|2\d|3[01])\.)\d+\.\d+(:\d+)?$/.test(origin);
+      const isVercel = /^https:\/\/[a-zA-Z0-9_-]+\.vercel\.app$/.test(origin);
+
+      if (isLocalhost || isLan || isVercel) {
+        return cb(null, true);
+      }
+
+      return cb(null, true);
+    },
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With'],
+    credentials: true,
   });
 
   // Register plugins

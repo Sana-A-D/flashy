@@ -2,27 +2,67 @@ import { Storage } from '../../utils/storage';
 import { Platform } from 'react-native';
 import Constants from 'expo-constants';
 
-// Dynamically resolve the host IP address where the Expo bundler or device is running
+// Resolve the API base URL correctly for each platform
 const envApiUrl = process.env.EXPO_PUBLIC_API_URL;
 const debuggerHost = Constants.expoConfig?.hostUri;
-let defaultHost = 'localhost';
-if (Platform.OS === 'android' && !debuggerHost) {
-  defaultHost = '10.0.2.2';
-}
-let webHost = 'localhost';
-if (Platform.OS === 'web' && typeof window !== 'undefined' && window.location?.hostname) {
-  webHost = window.location.hostname;
-}
-const localhost = Platform.OS === 'web' ? webHost : (debuggerHost?.split(':')[0] || defaultHost);
 
-// Port 3001 is the insecure HTTP port started by backend for mobile/LAN/web access
-export const ACTUAL_API_URL = Platform.OS === 'web'
-  ? `http://${webHost}:3001/api/v1`
-  : debuggerHost?.split(':')[0]
-  ? `http://${debuggerHost.split(':')[0]}:3001/api/v1`
-  : envApiUrl
-  ? envApiUrl.replace(':3000', ':3001')
-  : `http://${localhost}:3001/api/v1`;
+function resolveApiUrl(): string {
+  const isWeb = Platform.OS === 'web';
+  const hasWindow = typeof window !== 'undefined' && Boolean(window.location?.hostname);
+  const webHost = hasWindow ? window.location.hostname : '';
+  const isWebLocalhost = webHost === 'localhost' || webHost === '127.0.0.1';
+  const isWebLan = /^192\.168\.|^10\.|^172\.(1[6-9]|2\d|3[01])\./.test(webHost);
+  const isWebPublic = hasWindow && !isWebLocalhost && !isWebLan;
+
+  const isEnvLocalOrLan =
+    !envApiUrl ||
+    /localhost|127\.0\.0\.1|^https?:\/\/(192\.168\.|10\.|172\.(1[6-9]|2\d|3[01])\.)/.test(envApiUrl);
+
+  // 1. Web on Public Domain (e.g. Vercel deployment)
+  if (isWeb && isWebPublic) {
+    if (envApiUrl && !isEnvLocalOrLan) {
+      return envApiUrl.endsWith('/api/v1') ? envApiUrl : `${envApiUrl}/api/v1`;
+    }
+    return '/api/v1';
+  }
+
+  // 2. Web on Localhost (Browser dev on the same machine)
+  if (isWeb && isWebLocalhost) {
+    return 'http://localhost:3001/api/v1';
+  }
+
+  // 3. Web accessed via LAN IP from another machine/device
+  if (isWeb && isWebLan) {
+    return `http://${webHost}:3001/api/v1`;
+  }
+
+  // 4. Native (Expo Go / Android / iOS)
+  // Production / standalone app with public backend
+  if (envApiUrl && !isEnvLocalOrLan) {
+    return envApiUrl.endsWith('/api/v1') ? envApiUrl : `${envApiUrl}/api/v1`;
+  }
+
+  // Expo Go development: automatically uses the Metro server's actual LAN IP
+  if (debuggerHost) {
+    const ip = debuggerHost.split(':')[0];
+    return `http://${ip}:3001/api/v1`;
+  }
+
+  // Explicit local development environment variable
+  if (envApiUrl) {
+    return envApiUrl.endsWith('/api/v1') ? envApiUrl : `${envApiUrl}/api/v1`;
+  }
+
+  // Android emulator default gateway
+  if (Platform.OS === 'android') {
+    return 'http://10.0.2.2:3001/api/v1';
+  }
+
+  return 'http://localhost:3001/api/v1';
+}
+
+export const ACTUAL_API_URL = resolveApiUrl();
+
 
 
 

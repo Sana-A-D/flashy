@@ -430,7 +430,7 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
   },
   heroScrim: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: 'rgba(10, 14, 20, 0.65)',
   },
   heroContentLayer: {
@@ -628,11 +628,11 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   storyImage: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     resizeMode: 'cover',
   },
   storyScrim: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: 'rgba(12, 16, 22, 0.6)',
   },
   storyContent: {
