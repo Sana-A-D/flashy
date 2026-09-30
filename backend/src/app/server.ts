@@ -72,8 +72,8 @@ export const buildServer = (httpsOptions?: any) => {
     });
   });
 
-  server.get('/health', async () => {
-    return { status: 'ok', timestamp: new Date().toISOString() };
+  server.get('/health', async (request, reply) => {
+    return reply.status(200).send('ok');
   });
 
   // Register routes
