@@ -4,4 +4,5 @@ node_modules/
 dist/
 uploads/
 localhost*.pem
+*.pem
 .local-storage
